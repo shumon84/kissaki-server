@@ -23,6 +23,20 @@ var (
 	DB             = make([]StageInfo, 0)
 )
 
+func PostHandler(w http.ResponseWriter, r *http.Request) {
+	stageInfo := new(StageInfo)
+	if err := json.NewDecoder(r.Body).Decode(stageInfo); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+	stageInfo.CreatedAt = time.Now()
+	if len(DB) >= MaxNumOfStages {
+		DB = DB[1:MaxNumOfStages]
+	}
+	DB = append(DB, *stageInfo)
+}
+
 func GetHandler(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(DB)
 }
