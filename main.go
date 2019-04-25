@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 )
@@ -39,4 +40,17 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetHandler(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(DB)
+}
+
+func main() {
+	log.Fatal(http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			GetHandler(w, r)
+		case http.MethodPost:
+			PostHandler(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})))
 }
