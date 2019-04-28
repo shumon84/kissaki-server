@@ -15,13 +15,18 @@ type StageInfo struct {
 	Name          string    `json:"name"`
 	StageMap      StageMap  `json:"stage_map"`
 	StartPosition uint8     `json:"start_position"`
-	GoalPosition  uint8     `json:"goal_position"`
 	CreatedAt     time.Time `json:"created_at"`
+}
+
+type StageList struct {
+	Stage []StageInfo `json:"stage"`
 }
 
 var (
 	MaxNumOfStages = 30
-	DB             = make([]StageInfo, 0)
+	DB             = &StageList{
+		Stage: make([]StageInfo, 0),
+	}
 )
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,10 +37,10 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	stageInfo.CreatedAt = time.Now()
-	if len(DB) >= MaxNumOfStages {
-		DB = DB[1:MaxNumOfStages]
+	if len(DB.Stage) >= MaxNumOfStages {
+		DB.Stage = DB.Stage[1:MaxNumOfStages]
 	}
-	DB = append(DB, *stageInfo)
+	DB.Stage = append(DB.Stage, *stageInfo)
 }
 
 func GetHandler(w http.ResponseWriter, _ *http.Request) {
